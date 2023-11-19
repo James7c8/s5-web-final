@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import s5.webfinal.exception.EntityNotFoundException;
 import s5.webfinal.model.entity.Producto;
 import s5.webfinal.model.dto.ProductoDto;
-import s5.webfinal.model.dto.ProductoDtoSinId;
 import s5.webfinal.model.mapper.ProductoMapper;
 import s5.webfinal.repository.ProductoRepository;
 
@@ -23,18 +22,20 @@ public class ProductoServiceImpl implements ProductoService {
     private final ProductoRepository productoRepo;
 
     @Override
-    public ProductoDto crearProducto(ProductoDtoSinId productoDtoSinId) {
-        Producto producto = ProductoMapper.INSTANCE.mapToEntity(productoDtoSinId);
+    public ProductoDto crearProducto(ProductoDto productoDto) {
+        Producto producto = ProductoMapper.INSTANCE.mapToEntity(productoDto);
         return ProductoMapper.INSTANCE.mapToDto(productoRepo.save(producto));
     }
 
     @Override
     public ProductoDto getProductoById(Long id) {
-        return null;
+        Producto producto = productoRepo.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Producto.class));
+        return ProductoMapper.INSTANCE.mapToDto(producto);
     }
 
     @Override
-    public List<ProductoDto> getAllProducto() {
+    public List<ProductoDto> getProductos() {
         List<Producto> productos = productoRepo.findAll();
         return productos.stream()
                 .map(producto -> ProductoMapper.INSTANCE.mapToDto(producto))
@@ -42,17 +43,17 @@ public class ProductoServiceImpl implements ProductoService {
     }
 
     @Override
-    public ProductoDto actualizarProducto(Long id, ProductoDtoSinId productoDtoSinId) {
-        Producto producto = productoRepo.findById(id)
+    public ProductoDto actualizarProducto(ProductoDto productoDto) {
+        Producto producto = productoRepo.findById(productoDto.getId())
                 .orElseThrow(() -> new EntityNotFoundException(Producto.class));
 
         // TODO: Mejor manera de hacer esto?
-        producto.setDescripcion(productoDtoSinId.getDescripcion());
-        producto.setExistencia(productoDtoSinId.getExistencia());
-        producto.setPrecio(productoDtoSinId.getPrecio());
-        producto.setFechaUltIngreso(productoDtoSinId.getFechaUltIngreso());
-        producto.setDisponible(productoDtoSinId.isDisponible());
-        producto.setCategoria(productoDtoSinId.getCategoria());
+        producto.setDescripcion(productoDto.getDescripcion());
+        producto.setExistencia(productoDto.getExistencia());
+        producto.setPrecio(productoDto.getPrecio());
+        producto.setFechaUltIngreso(productoDto.getFechaUltIngreso());
+        producto.setDisponible(productoDto.isDisponible());
+        producto.setCategoria(productoDto.getCategoria());
 
         return ProductoMapper.INSTANCE.mapToDto(productoRepo.save(producto));
     }

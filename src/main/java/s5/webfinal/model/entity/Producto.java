@@ -10,10 +10,8 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Data
-@RequiredArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "producto")
@@ -44,6 +42,6 @@ public class Producto {
     private boolean disponible;
 
     @Column(nullable = false)
-    @NotBlank(message = "Si no hay categoria debe ponerle NA")
+    @NotBlank(message = "La categoria no puede estar vacia")
     private String categoria;
 }
